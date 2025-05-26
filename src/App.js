@@ -6,7 +6,6 @@ const API_BASE_URL = 'http://localhost:5000'; // Assuming Python backend runs on
 function App() {
   const [experienceList, setExperienceList] = useState([]);
   const [educationList, setEducationList] = useState([]);
-  const [skillList, setSkillList] = useState([]); // State for skills
   const [showEducationForm, setShowEducationForm] = useState(false);
   const [currentEducation, setCurrentEducation] = useState(null); // null for new, object for edit
   const [educationFormData, setEducationFormData] = useState({
@@ -37,14 +36,6 @@ function App() {
   const [educationDescriptionSuggestions, setEducationDescriptionSuggestions] = useState([]);
   const [isLoadingEducationSuggestions, setIsLoadingEducationSuggestions] = useState(false);
 
-  // --- Skill State ---
-  const [showSkillForm, setShowSkillForm] = useState(false);
-  const [skillFormData, setSkillFormData] = useState({
-    name: '',
-    proficiency: '',
-    logo: 'example-logo.png' // Default or allow upload
-  });
-
   // --- Fetch Initial Data ---
   useEffect(() => {
     // Fetch experience
@@ -58,12 +49,6 @@ function App() {
       .then(res => res.json())
       .then(data => setEducationList(data || []))
       .catch(err => console.error("Error fetching education:", err));
-
-    // Fetch skills
-    fetch(`${API_BASE_URL}/resume/skill`)
-      .then(res => res.json())
-      .then(data => setSkillList(data || []))
-      .catch(err => console.error("Error fetching skills:", err));
   }, []);
 
   // --- Experience Handlers ---
@@ -173,9 +158,6 @@ function App() {
   // Augment educationList with indices
   const augmentedEducationList = educationList.map((edu, index) => ({ ...edu, index }));
 
-  // Augment skillList with indices (if needed for future edit/delete - not strictly for add)
-  const augmentedSkillList = skillList.map((skill, index) => ({ ...skill, index }));
-
   // --- Education Handlers ---
   const handleOpenEducationForm = (edu) => {
     if (edu) {
@@ -260,40 +242,6 @@ function App() {
   const handleAcceptEducationSuggestion = (suggestion) => {
     setEducationFormData(prev => ({ ...prev, description: suggestion }));
     setEducationDescriptionSuggestions([]);
-  };
-
-  // --- Skill Handlers ---
-  const handleOpenSkillForm = () => { // For now, only adding new skills
-    setSkillFormData({ name: '', proficiency: '', logo: 'example-logo.png' });
-    setShowSkillForm(true);
-  };
-
-  const handleSkillFormChange = (e) => {
-    const { name, value } = e.target;
-    setSkillFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSaveSkill = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/resume/skill`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(skillFormData)
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-      }
-      // const newSkill = await response.json(); // Contains { id: ... }
-      // To refresh the list correctly and simply:
-      fetch(`${API_BASE_URL}/resume/skill`)
-        .then(res => res.json())
-        .then(data => setSkillList(data || []));
-      setShowSkillForm(false);
-    } catch (error) {
-      console.error("Error saving skill:", error);
-      alert(`Error saving skill: ${error.message}`);
-    }
   };
 
   return (
@@ -401,50 +349,9 @@ function App() {
       {/* --- Skills Section (TODO) --- */}
       <div className="resumeSection">
         <h2>Skills</h2>
-        {augmentedSkillList.map((skill, index) => (
-          <div key={skill.id || index} className="resumeItem">
-            <h4>{skill.name}</h4>
-            <p>Proficiency: {skill.proficiency}</p>
-            {/* Display logo if available - assuming it's a URL */}
-            {/* skill.logo && <img src={skill.logo} alt={`${skill.name} logo`} style={{width: "50px", height: "50px"}} /> */}
-            {/* TODO: Add Edit/Delete Buttons for skills later */}
-          </div>
-        ))}
-        <button onClick={handleOpenSkillForm}>Add Skill</button>
+        <p>Skill Placeholder</p>
+        <button>Add Skill</button>
       </div>
-      
-      {showSkillForm && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Add Skill</h3>
-            <input 
-              type="text" 
-              name="name" 
-              value={skillFormData.name} 
-              onChange={handleSkillFormChange} 
-              placeholder="Skill Name (e.g., JavaScript)" 
-            />
-            <input 
-              type="text" 
-              name="proficiency" 
-              value={skillFormData.proficiency} 
-              onChange={handleSkillFormChange} 
-              placeholder="Proficiency (e.g., 2-4 years, Advanced)" 
-            />
-            <input 
-              type="text" 
-              name="logo" 
-              value={skillFormData.logo} 
-              onChange={handleSkillFormChange} 
-              placeholder="Logo URL (e.g., https://.../logo.png)" 
-            />
-            <div className="modal-buttons">
-              <button onClick={handleSaveSkill}>Save Skill</button>
-              <button onClick={() => setShowSkillForm(false)} className="cancel-btn">Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
       
       <br />
       <button>Export</button>
