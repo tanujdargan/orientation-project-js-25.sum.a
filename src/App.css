@@ -1,14 +1,25 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   background-color: rgb(29, 83, 159);
 }
 
 .App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
   text-align: center;
   color: white;
 }
 
 .resumeSection {
   background-color: white;
+  max-width: 70rem;
+  width: 80%;
   padding: 10px;
   margin-left: 30%;
   margin-right: 30%;
@@ -26,4 +37,50 @@ button {
   padding: 10px;
   border-radius: 4px;
   background-color: rgb(248 185 42);
+}
+
+.educationForm {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 10px;
+  margin: 20px;
+  background-color: white;
+  padding-block: 30px;
+  padding-inline: 30px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  color: black;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  border: 1px solid #ccc;
+  transition: box-shadow 0.3s ease;
+}
+
+.educationForm label {
+  font-weight: bold;
+  color: #333;
+  padding-right: 4px;
+}
+
+.educationForm div {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  width: 100%;
+}
+
+.educationForm input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.educationFormWrapper {
+  margin-block: 15px;
 }
