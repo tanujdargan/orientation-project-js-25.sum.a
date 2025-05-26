@@ -6,7 +6,17 @@ const API_BASE_URL = 'http://localhost:5000'; // Assuming Python backend runs on
 function App() {
   const [experienceList, setExperienceList] = useState([]);
   const [educationList, setEducationList] = useState([]);
-  // ... (similar state for education)
+  const [showEducationForm, setShowEducationForm] = useState(false);
+  const [currentEducation, setCurrentEducation] = useState(null); // null for new, object for edit
+  const [educationFormData, setEducationFormData] = useState({
+    course: '',
+    school: '',
+    start_date: '',
+    end_date: '',
+    grade: '',
+    description: '',
+    logo: 'example-logo.png' // Default or allow upload
+  });
 
   // --- Experience State ---
   const [showExperienceForm, setShowExperienceForm] = useState(false);
@@ -22,6 +32,10 @@ function App() {
   const [descriptionSuggestions, setDescriptionSuggestions] = useState([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
+  // --- Education State ---
+  const [educationDescriptionSuggestions, setEducationDescriptionSuggestions] = useState([]);
+  const [isLoadingEducationSuggestions, setIsLoadingEducationSuggestions] = useState(false);
+
   // --- Fetch Initial Data ---
   useEffect(() => {
     // Fetch experience
@@ -30,11 +44,11 @@ function App() {
       .then(data => setExperienceList(data || []))
       .catch(err => console.error("Error fetching experience:", err));
 
-    // TODO: Fetch education similarly
-    // fetch(`${API_BASE_URL}/resume/education`)
-    //   .then(res => res.json())
-    //   .then(data => setEducationList(data || []))
-    //   .catch(err => console.error("Error fetching education:", err));
+    // Fetch education
+    fetch(`${API_BASE_URL}/resume/education`)
+      .then(res => res.json())
+      .then(data => setEducationList(data || []))
+      .catch(err => console.error("Error fetching education:", err));
   }, []);
 
   // --- Experience Handlers ---
@@ -93,41 +107,11 @@ function App() {
       alert("Please enter a description first.");
       return;
     }
-    // This requires the index of the item if it's an existing one.
-    // If it's a new item, we can't get suggestions based on an index.
-    // The backend endpoint /suggest-description is currently /<int:index>/suggest-description
-    // For a new item, we might need a different endpoint or pass description in body.
-    // The current backend takes description from body if provided, otherwise from stored item.
-    // Let's assume for now if it's a new item (currentExperience is null or has no index),
-    // we can still call with a dummy index like -1, and rely on description in body.
-    // OR, the backend could be enhanced to allow POST /resume/experience/suggest-description (no index)
-    // For now, let's proceed assuming an index is available or the backend handles it.
-    // If currentExperience is null (new item), this specific endpoint won't work as designed.
-    // We will call it using the current description from the form.
     
-    let itemIndex = -1; // Placeholder for new item
+    let itemIndex = 0; // Default for new item, backend will use description from body
     if (currentExperience && currentExperience.index !== undefined) {
         itemIndex = currentExperience.index;
-    } else {
-        // For a truly new item not yet saved, it has no index.
-        // The backend suggestion endpoint expects an index.
-        // One solution: allow a special index (e.g. 0 and send description) or a different route.
-        // For this example, we'll show an alert if trying to get suggestions for a truly new, unsaved item.
-        // Or, we can allow getting suggestions based purely on the typed text without an existing item context.
-        // The python backend was modified to take description from request body if present.
-        // So, we can technically call it with any valid index, even for a "new" item concept,
-        // as long as we send the description. Let's use index 0 as a placeholder if no item selected.
-        // This assumes that the backend's data['experience'][0] exists or the check for
-        // request_data['description'] in the backend will save us.
-        if (itemIndex === -1 && experienceList.length > 0) itemIndex = 0; // Fallback for safety, not ideal
-        else if (itemIndex === -1 && experienceList.length === 0) {
-            alert("Cannot get suggestions without at least one existing experience item as context for the backend endpoint structure, or save the item first.");
-            // Alternatively, the backend could have a POST /resume/suggest-description route
-            // that doesn't require an index and only takes a description.
-            return;
-        }
-    }
-
+    } // No complex fallback needed if description is always sent in body.
 
     setIsLoadingSuggestions(true);
     try {
@@ -171,6 +155,94 @@ function App() {
   // Augment experienceList with indices when it's fetched/updated
   const augmentedExperienceList = experienceList.map((exp, index) => ({ ...exp, index }));
 
+  // Augment educationList with indices
+  const augmentedEducationList = educationList.map((edu, index) => ({ ...edu, index }));
+
+  // --- Education Handlers ---
+  const handleOpenEducationForm = (edu) => {
+    if (edu) {
+      setCurrentEducation(edu); 
+      setEducationFormData({ ...edu });
+    } else {
+      setCurrentEducation(null);
+      setEducationFormData({ course: '', school: '', start_date: '', end_date: '', grade: '', description: '', logo: 'example-logo.png' });
+    }
+    setEducationDescriptionSuggestions([]); // Reset suggestions
+    setShowEducationForm(true);
+  };
+
+  const handleEducationFormChange = (e) => {
+    const { name, value } = e.target;
+    setEducationFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveEducation = async () => {
+    const method = currentEducation && currentEducation.index !== undefined ? 'PUT' : 'POST';
+    const url = currentEducation && currentEducation.index !== undefined 
+                ? `${API_BASE_URL}/resume/education/${currentEducation.index}` 
+                : `${API_BASE_URL}/resume/education`;
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(educationFormData)
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      // Refresh list
+      fetch(`${API_BASE_URL}/resume/education`)
+        .then(res => res.json())
+        .then(data => setEducationList(data || []));
+      setShowEducationForm(false);
+      setCurrentEducation(null);
+    } catch (error) {
+      console.error("Error saving education:", error);
+      alert(`Error saving education: ${error.message}`);
+    }
+  };
+
+  // --- AI Suggestion Handlers for Education ---
+  const handleGetEducationSuggestions = async () => {
+    if (!educationFormData.description) {
+      alert("Please enter a description first.");
+      return;
+    }
+
+    let itemIndex = 0; // Default for new or if index is not critical due to body a.description
+    if (currentEducation && currentEducation.index !== undefined) {
+        itemIndex = currentEducation.index;
+    } 
+    // If it's a new item, backend uses description from body. Send 0 as placeholder index.
+
+    setIsLoadingEducationSuggestions(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/resume/education/${itemIndex}/suggest-description`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: educationFormData.description })
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setEducationDescriptionSuggestions(data.suggestions || []);
+    } catch (error) {
+      console.error("Error fetching education suggestions:", error);
+      alert(`Error fetching education suggestions: ${error.message}`);
+      setEducationDescriptionSuggestions([]);
+    } finally {
+      setIsLoadingEducationSuggestions(false);
+    }
+  };
+
+  const handleAcceptEducationSuggestion = (suggestion) => {
+    setEducationFormData(prev => ({ ...prev, description: suggestion }));
+    setEducationDescriptionSuggestions([]);
+  };
 
   return (
     <div className="App">
@@ -216,8 +288,10 @@ function App() {
             </div>
             
             {/* <input type="text" name="logo" value={experienceFormData.logo} onChange={handleExperienceFormChange} placeholder="Logo URL" /> */}
-            <button onClick={handleSaveExperience}>Save Experience</button>
-            <button onClick={() => setShowExperienceForm(false)}>Cancel</button>
+            <div className="modal-buttons">
+              <button onClick={handleSaveExperience}>Save Experience</button>
+              <button onClick={() => setShowExperienceForm(false)} className="cancel-btn">Cancel</button>
+            </div>
           </div>
         </div>
       )}
@@ -225,10 +299,52 @@ function App() {
       {/* --- Education Section (TODO) --- */}
       <div className="resumeSection">
         <h2>Education</h2>
-        {/* TODO: Map educationList and implement form similar to Experience */}
-        <p>Education Placeholder</p>
-        <button>Add Education</button>
+        {augmentedEducationList.map((edu, index) => (
+          <div key={edu.id || index} className="resumeItem">
+            <h4>{edu.course} at {edu.school}</h4>
+            <p><i>{edu.start_date} - {edu.end_date}, Grade: {edu.grade}</i></p>
+            <p>{edu.description}</p>
+            <button onClick={() => handleOpenEducationForm(edu)}>Edit</button>
+            {/* TODO: Add Delete Button */}
+          </div>
+        ))}
+        <button onClick={() => handleOpenEducationForm(null)}>Add Education</button>
       </div>
+      
+      {showEducationForm && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>{currentEducation ? 'Edit' : 'Add'} Education</h3>
+            <input type="text" name="course" value={educationFormData.course} onChange={handleEducationFormChange} placeholder="Course/Degree" />
+            <input type="text" name="school" value={educationFormData.school} onChange={handleEducationFormChange} placeholder="School/University" />
+            <input type="text" name="start_date" value={educationFormData.start_date} onChange={handleEducationFormChange} placeholder="Start Date" />
+            <input type="text" name="end_date" value={educationFormData.end_date} onChange={handleEducationFormChange} placeholder="End Date" />
+            <input type="text" name="grade" value={educationFormData.grade} onChange={handleEducationFormChange} placeholder="Grade/GPA" />
+            <textarea name="description" value={educationFormData.description} onChange={handleEducationFormChange} placeholder="Description" />
+            
+            <div className="suggestions-container">
+              <button onClick={handleGetEducationSuggestions} disabled={isLoadingEducationSuggestions}>
+                {isLoadingEducationSuggestions ? 'Getting Suggestions...' : 'Get AI Suggestions'}
+              </button>
+              {educationDescriptionSuggestions.length > 0 && (
+                <ul className="suggestions-list">
+                  {educationDescriptionSuggestions.map((s, i) => (
+                    <li key={i} onClick={() => handleAcceptEducationSuggestion(s)}>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* <input type="text" name="logo" value={educationFormData.logo} onChange={handleEducationFormChange} placeholder="Logo URL" /> */}
+            <div className="modal-buttons">
+              <button onClick={handleSaveEducation}>Save Education</button>
+              <button onClick={() => setShowEducationForm(false)} className="cancel-btn">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* --- Skills Section (TODO) --- */}
       <div className="resumeSection">
