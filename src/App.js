@@ -5,6 +5,11 @@ import InfoForm from './InfoForm'; // Import the new form
 const API_BASE_URL = 'http://localhost:5000'; // Assuming Python backend runs on port 5000
 
 function App() {
+  // Personal Information State
+  const [personName, setPersonName] = useState('John Doe'); // Example
+  const [personPhoneNumber, setPersonPhoneNumber] = useState('+1234567890'); // Example
+  const [personEmail, setPersonEmail] = useState('john.doe@example.com'); // Example
+
   const [experienceList, setExperienceList] = useState([]);
   const [educationList, setEducationList] = useState([]);
   const [showEducationForm, setShowEducationForm] = useState(false);
@@ -247,12 +252,28 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Resume Builder</h1>
+      <h1 className="no-print">Resume Builder</h1>
 
       {/* Personal Info Section */}
-      <div className="resumeSection">
+      <div className="resumeSection personal-info-section">
         <h2>Personal Information</h2>
-        <InfoForm />
+        {/* Static display for printing */}
+        <div className="personal-info-display print-only">
+          <p><strong>Name:</strong> {personName}</p>
+          <p><strong>Phone:</strong> {personPhoneNumber}</p>
+          <p><strong>Email:</strong> {personEmail}</p>
+        </div>
+        {/* Editable Form for screen, will be hidden on print */}
+        <div className="info-form-wrapper no-print">
+          <InfoForm 
+            name={personName}
+            setName={setPersonName}
+            phoneNumber={personPhoneNumber}
+            setPhoneNumber={setPersonPhoneNumber}
+            email={personEmail}
+            setEmail={setPersonEmail}
+          />
+        </div>
       </div>
 
       {/* Experience Section */}
@@ -262,15 +283,15 @@ function App() {
           <div key={exp.id || index} className="resumeItem"> {/* Use a stable key */}
             <h4>{exp.title} at {exp.company}</h4>
             <p>{exp.description}</p>
-            <button onClick={() => handleOpenExperienceForm(exp)}>Edit</button>
+            <button className="no-print" onClick={() => handleOpenExperienceForm(exp)}>Edit</button>
             {/* TODO: Add Delete Button */}
           </div>
         ))}
-        <button onClick={() => handleOpenExperienceForm(null)}>Add Experience</button>
+        <button className="no-print" onClick={() => handleOpenExperienceForm(null)}>Add Experience</button>
       </div>
 
       {showExperienceForm && (
-        <div className="modal">
+        <div className="modal no-print">
           <div className="modal-content">
             <h3>{currentExperience ? 'Edit' : 'Add'} Experience</h3>
             <input type="text" name="title" value={experienceFormData.title} onChange={handleExperienceFormChange} placeholder="Title" />
@@ -280,7 +301,7 @@ function App() {
             <textarea name="description" value={experienceFormData.description} onChange={handleExperienceFormChange} placeholder="Description" />
             
             <div className="suggestions-container">
-              <button onClick={handleGetSuggestions} disabled={isLoadingSuggestions}>
+              <button className="no-print" onClick={handleGetSuggestions} disabled={isLoadingSuggestions}>
                 {isLoadingSuggestions ? 'Getting Suggestions...' : 'Get AI Suggestions'}
               </button>
               {descriptionSuggestions.length > 0 && (
@@ -296,8 +317,8 @@ function App() {
             
             {/* <input type="text" name="logo" value={experienceFormData.logo} onChange={handleExperienceFormChange} placeholder="Logo URL" /> */}
             <div className="modal-buttons">
-              <button onClick={handleSaveExperience}>Save Experience</button>
-              <button onClick={() => setShowExperienceForm(false)} className="cancel-btn">Cancel</button>
+              <button className="no-print" onClick={handleSaveExperience}>Save Experience</button>
+              <button className="no-print cancel-btn" onClick={() => setShowExperienceForm(false)}>Cancel</button>
             </div>
           </div>
         </div>
@@ -311,15 +332,15 @@ function App() {
             <h4>{edu.course} at {edu.school}</h4>
             <p><i>{edu.start_date} - {edu.end_date}, Grade: {edu.grade}</i></p>
             <p>{edu.description}</p>
-            <button onClick={() => handleOpenEducationForm(edu)}>Edit</button>
+            <button className="no-print" onClick={() => handleOpenEducationForm(edu)}>Edit</button>
             {/* TODO: Add Delete Button */}
           </div>
         ))}
-        <button onClick={() => handleOpenEducationForm(null)}>Add Education</button>
+        <button className="no-print" onClick={() => handleOpenEducationForm(null)}>Add Education</button>
       </div>
       
       {showEducationForm && (
-        <div className="modal">
+        <div className="modal no-print">
           <div className="modal-content">
             <h3>{currentEducation ? 'Edit' : 'Add'} Education</h3>
             <input type="text" name="course" value={educationFormData.course} onChange={handleEducationFormChange} placeholder="Course/Degree" />
@@ -330,7 +351,7 @@ function App() {
             <textarea name="description" value={educationFormData.description} onChange={handleEducationFormChange} placeholder="Description" />
             
             <div className="suggestions-container">
-              <button onClick={handleGetEducationSuggestions} disabled={isLoadingEducationSuggestions}>
+              <button className="no-print" onClick={handleGetEducationSuggestions} disabled={isLoadingEducationSuggestions}>
                 {isLoadingEducationSuggestions ? 'Getting Suggestions...' : 'Get AI Suggestions'}
               </button>
               {educationDescriptionSuggestions.length > 0 && (
@@ -346,8 +367,8 @@ function App() {
 
             {/* <input type="text" name="logo" value={educationFormData.logo} onChange={handleEducationFormChange} placeholder="Logo URL" /> */}
             <div className="modal-buttons">
-              <button onClick={handleSaveEducation}>Save Education</button>
-              <button onClick={() => setShowEducationForm(false)} className="cancel-btn">Cancel</button>
+              <button className="no-print" onClick={handleSaveEducation}>Save Education</button>
+              <button className="no-print cancel-btn" onClick={() => setShowEducationForm(false)}>Cancel</button>
             </div>
           </div>
         </div>
@@ -357,11 +378,11 @@ function App() {
       <div className="resumeSection">
         <h2>Skills</h2>
         <p>Skill Placeholder</p>
-        <button>Add Skill</button>
+        <button className="no-print">Add Skill</button>
       </div>
       
       <br />
-      <button>Export</button>
+      <button className="no-print" onClick={() => window.print()}>Export as PDF</button>
     </div>
   );
 }

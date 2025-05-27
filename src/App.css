@@ -188,3 +188,89 @@ button:hover {
     display: inline-block; /* For multiple buttons side-by-side */
     margin: 5px;
 }
+
+/* Print specific styles */
+@media print {
+  body {
+    background-color: white !important; /* Ensure background is white for print */
+    color: black !important; /* Ensure text is black */
+    font-size: 12pt; /* Adjust base font size for print */
+  }
+
+  .no-print,
+  .no-print * { /* Hide elements with .no-print class and all their children */
+    display: none !important;
+  }
+
+  .print-only,
+  .print-only * { /* Ensure elements meant only for print are shown */
+    display: block !important; /* Use block, or table-row, etc. as appropriate for the element */
+    visibility: visible !important; /* Ensure visibility */
+  }
+  
+  /* Specifically for child paragraph elements within personal-info-display if they were part of a .no-print parent initially */
+  .personal-info-display.print-only p {
+      display: block !important; 
+      visibility: visible !important;
+  }
+
+  .resumeSection {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 15px !important;
+    padding: 15px !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+    background-color: white !important; /* Ensure section backgrounds are white */
+    color: black !important; /* Ensure section text is black */
+  }
+
+  .resumeSection h2 {
+    font-size: 16pt !important;
+    margin-top: 0 !important;
+    border-bottom: 2px solid black !important;
+    padding-bottom: 5px !important;
+    color: black !important; /* Ensure heading text is black */
+  }
+
+  .resumeItem {
+    margin-bottom: 10px !important;
+    page-break-inside: avoid !important;
+  }
+  
+  .resumeItem h4 {
+    font-size: 14pt !important;
+    margin-bottom: 3px !important;
+    color: black !important;
+  }
+
+  .resumeItem p {
+    font-size: 11pt !important;
+    font-style: normal !important;
+    color: black !important;
+  }
+
+  .personal-info-section h2 { /* Keep the title for personal info section */
+      display: block !important;
+  }
+
+  .personal-info-display p strong {
+      color: black !important; /* Ensure strong text is black */
+  }
+
+  /* Hide the main App title explicitly if it wasn't caught by .no-print */
+  .App > h1 {
+    display: none !important;
+  }
+
+  /* Ensure modals are definitely hidden */
+  .modal {
+    display: none !important;
+  }
+  
+  br { /* Hide <br> tags that might cause unwanted spacing */
+      display: none !important;
+  }
+}
