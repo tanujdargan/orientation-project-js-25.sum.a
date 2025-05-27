@@ -7,11 +7,29 @@
 
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { getEducation } from "../requests/education";
+import { addEducation, getEducation } from "../requests/education";
 
 const Education = () => {
   const [addEducation, setAddEducation] = useState(false);
-  const [educationData, setEducationData] = useState([]);
+  const [educationData, setEducationData] = useState([
+    //populate the initial state with data
+    {
+      course: "Bachelor of Science in Computer Science",
+      school: "University of Example",
+      start_date: "2015-09-01",
+      end_date: "2019-06-30",
+      grade: "First Class",
+      logo: "https://example.com/logo.png",
+    },
+    {
+      course: "Master of Science in Software Engineering",
+      school: "Example University",
+      start_date: "2020-09-01",
+      end_date: "2022-06-30",
+      grade: "Distinction",
+      logo: "https://example.com/logo2.png",
+    },
+  ]);
 
   useEffect(() => {
     async function fetchData() {
@@ -29,18 +47,26 @@ const Education = () => {
       <h2>Education</h2>
 
       {educationData.length === 0 && <p>No education data available.</p>}
-      {addEducation && <EducationForm />}
-      {educationData.map((edu, index) => (
-        <DisplayEducation
-          key={index}
-          course={edu.course}
-          school={edu.school}
-          start_date={edu.start_date}
-          end_date={edu.end_date}
-          grade={edu.grade}
-          logo={edu.logo}
+      {addEducation && (
+        <EducationForm
+          setEducationData={setEducationData}
+          setAddEducation={setAddEducation}
         />
-      ))}
+      )}
+      <div className="education-wrapper">
+        {!addEducation &&
+          educationData.map((edu, index) => (
+            <DisplayEducation
+              key={index}
+              course={edu.course}
+              school={edu.school}
+              start_date={edu.start_date}
+              end_date={edu.end_date}
+              grade={edu.grade}
+              logo={edu.logo}
+            />
+          ))}
+      </div>
       <button onClick={() => setAddEducation(!addEducation)}>
         {addEducation ? "Hide Form" : "Add Education"}
       </button>
@@ -58,19 +84,23 @@ function DisplayEducation({
   logo,
 }) {
   return (
-    <div>
-      <h2>{course}</h2>
-      <p>{school}</p>
-      <p>
-        {start_date} - {end_date}
-      </p>
-      <p>{grade}</p>
-      <img src={logo} alt={`${school} logo`} />
+    <div className="education-card">
+      <div className="education-logo">
+        <img src={logo} alt={`${school} logo`} />
+      </div>
+      <div className="education-info">
+        <h3 className="education-course">{course}</h3>
+        <h4 className="education-school">{school}</h4>
+        <p className="education-dates">
+          {start_date} - {end_date}
+        </p>
+        <p className="education-grade">{grade}</p>
+      </div>
     </div>
   );
 }
 
-function EducationForm() {
+function EducationForm({ setEducationData, setAddEducation }) {
   const [initialValues, setInitialValues] = useState({
     course: "",
     school: "",
@@ -80,9 +110,36 @@ function EducationForm() {
     logo: "",
   });
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
+    try {
+      await addEducation(initialValues);
+      // Reset form after successful submission
+      setInitialValues({
+        course: "",
+        school: "",
+        start_date: "",
+        end_date: "",
+        grade: "",
+        logo: "",
+      });
+
+      setEducationData((prevData) => [
+        ...prevData,
+        initialValues, // Add the new education data to the existing data
+      ]);
+
+      setAddEducation(false); // Hide the form after submission
+
+      //showing success message
+      alert("Education data added successfully!");
+    } catch (error) {
+      console.error("Error adding education data:", error);
+    }
+    // Updating education.
   };
+
   const handleChange = (event) => {
     // Handle input changes
     const { name, value } = event.target;
