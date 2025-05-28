@@ -1,14 +1,25 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   background-color: rgb(29, 83, 159);
 }
 
 .App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
   text-align: center;
   color: white;
 }
 
 .resumeSection {
   background-color: white;
+  max-width: 70rem;
+  width: 80%;
   padding: 10px;
   margin-left: 30%;
   margin-right: 30%;
@@ -273,4 +284,145 @@ button:hover {
   br { /* Hide <br> tags that might cause unwanted spacing */
       display: none !important;
   }
+}
+
+/* Education Form Styles */
+.educationForm {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 10px;
+  margin: 20px;
+  background-color: white;
+  padding-block: 30px;
+  padding-inline: 30px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  color: black;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  border: 1px solid #ccc;
+  transition: box-shadow 0.3s ease;
+}
+
+.educationForm label {
+  font-weight: bold;
+  color: #333;
+  padding-right: 4px;
+}
+
+.educationForm div {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  width: 100%;
+}
+
+.educationForm input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.educationFormWrapper {
+  margin-block: 15px;
+}
+
+.education-card {
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  max-width: fit-content;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.education-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.education-card:hover {
+  transform: translateY(-5px);
+}
+
+.education-logo {
+  width: 80px;
+  height: 80px;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.education-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.education-info {
+  flex: 1;
+}
+
+.education-course {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.education-school {
+  font-size: 16px;
+  margin: 0 0 8px 0;
+  color: #555;
+}
+
+.education-dates {
+  font-size: 14px;
+  color: #777;
+  margin: 0 0 5px 0;
+}
+
+.education-grade {
+  font-weight: 500;
+  color: #444;
+  margin: 0;
+}
+
+/* Education Form Styling Override */
+.educationFormWrapper {
+  margin-bottom: 20px;
+}
+
+.educationForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.educationForm div {
+  display: flex;
+  flex-direction: column;
+}
+
+.educationForm label {
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.educationForm input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
