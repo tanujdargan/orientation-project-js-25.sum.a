@@ -1,4 +1,5 @@
 import "./App.css";
+import Education from "./components/Education";
 
 function App() {
   return (
@@ -10,12 +11,7 @@ function App() {
         <button>Add Experience</button>
         <br></br>
       </div>
-      <div className="resumeSection">
-        <h2>Education</h2>
-        <p>Education Placeholder</p>
-        <button>Add Education</button>
-        <br></br>
-      </div>
+      <Education />
       <div className="resumeSection">
         <h2>Skills</h2>
         <p>Skill Placeholder</p>
