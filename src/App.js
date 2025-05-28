@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "./App.css";
 import InfoForm from './InfoForm'; // Import the new form
-
 const API_BASE_URL = 'http://localhost:5000'; // Assuming Python backend runs on port 5000
 
 function App() {
@@ -77,9 +76,9 @@ function App() {
 
   const handleSaveExperience = async () => {
     const method = currentExperience && currentExperience.index !== undefined ? 'PUT' : 'POST';
-    const url = currentExperience && currentExperience.index !== undefined 
-                ? `${API_BASE_URL}/resume/experience/${currentExperience.index}` 
-                : `${API_BASE_URL}/resume/experience`;
+    const url = currentExperience && currentExperience.index !== undefined
+      ? `${API_BASE_URL}/resume/experience/${currentExperience.index}`
+      : `${API_BASE_URL}/resume/experience`;
 
     try {
       const response = await fetch(url, {
@@ -102,16 +101,16 @@ function App() {
       alert(`Error saving experience: ${error.message}`);
     }
   };
-  
+
   const handleGetSuggestions = async () => {
     if (!experienceFormData.description) {
       alert("Please enter a description first.");
       return;
     }
-    
+
     let itemIndex = 0; // Default for new item, backend will use description from body
     if (currentExperience && currentExperience.index !== undefined) {
-        itemIndex = currentExperience.index;
+      itemIndex = currentExperience.index;
     } // No complex fallback needed if description is always sent in body.
 
     setIsLoadingSuggestions(true);
@@ -143,16 +142,16 @@ function App() {
 
   // Helper to find index of an item in experienceList (if items don't have 'index' property)
   // This is crucial because the backend uses list indices.
-  const findExperienceIndex = (expItem) => {
-    // If expItem already has an index from backend (e.g. when loading), use it.
-    // Otherwise, we need a robust way to map UI items to backend indices.
-    // For simplicity, if items are just objects from the list, their actual index in the JS array is key.
-    // This means when we load experienceList, we should augment it with indices.
-    return experienceList.findIndex(item => 
-        item.title === expItem.title && item.company === expItem.company // Example: simplistic comparison
-    );
-  };
-  
+  // const findExperienceIndex = (expItem) => { // This helper seems not to be used directly by handlers, augmentation is used instead
+  //   // If expItem already has an index from backend (e.g. when loading), use it.
+  //   // Otherwise, we need a robust way to map UI items to backend indices.
+  //   // For simplicity, if items are just objects from the list, their actual index in the JS array is key.
+  //   // This means when we load experienceList, we should augment it with indices.
+  //   return experienceList.findIndex(item =>
+  //       item.title === expItem.title && item.company === expItem.company // Example: simplistic comparison
+  //   );
+  // };
+
   // Augment experienceList with indices when it's fetched/updated
   const augmentedExperienceList = experienceList.map((exp, index) => ({ ...exp, index }));
 
@@ -162,7 +161,7 @@ function App() {
   // --- Education Handlers ---
   const handleOpenEducationForm = (edu) => {
     if (edu) {
-      setCurrentEducation(edu); 
+      setCurrentEducation(edu);
       setEducationFormData({ ...edu });
     } else {
       setCurrentEducation(null);
@@ -179,9 +178,9 @@ function App() {
 
   const handleSaveEducation = async () => {
     const method = currentEducation && currentEducation.index !== undefined ? 'PUT' : 'POST';
-    const url = currentEducation && currentEducation.index !== undefined 
-                ? `${API_BASE_URL}/resume/education/${currentEducation.index}` 
-                : `${API_BASE_URL}/resume/education`;
+    const url = currentEducation && currentEducation.index !== undefined
+      ? `${API_BASE_URL}/resume/education/${currentEducation.index}`
+      : `${API_BASE_URL}/resume/education`;
 
     try {
       const response = await fetch(url, {
@@ -214,8 +213,8 @@ function App() {
 
     let itemIndex = 0; // Default for new or if index is not critical due to body a.description
     if (currentEducation && currentEducation.index !== undefined) {
-        itemIndex = currentEducation.index;
-    } 
+      itemIndex = currentEducation.index;
+    }
     // If it's a new item, backend uses description from body. Send 0 as placeholder index.
 
     setIsLoadingEducationSuggestions(true);
@@ -278,7 +277,7 @@ function App() {
             <input type="text" name="start_date" value={experienceFormData.start_date} onChange={handleExperienceFormChange} placeholder="Start Date" />
             <input type="text" name="end_date" value={experienceFormData.end_date} onChange={handleExperienceFormChange} placeholder="End Date" />
             <textarea name="description" value={experienceFormData.description} onChange={handleExperienceFormChange} placeholder="Description" />
-            
+
             <div className="suggestions-container">
               <button onClick={handleGetSuggestions} disabled={isLoadingSuggestions}>
                 {isLoadingSuggestions ? 'Getting Suggestions...' : 'Get AI Suggestions'}
@@ -293,7 +292,7 @@ function App() {
                 </ul>
               )}
             </div>
-            
+
             {/* <input type="text" name="logo" value={experienceFormData.logo} onChange={handleExperienceFormChange} placeholder="Logo URL" /> */}
             <div className="modal-buttons">
               <button onClick={handleSaveExperience}>Save Experience</button>
@@ -304,7 +303,8 @@ function App() {
       )}
 
       {/* Education Section (TODO) */}
-      <div className="resumeSection">
+
+<div className="resumeSection">
         <h2>Education</h2>
         {augmentedEducationList.map((edu, index) => (
           <div key={edu.id || index} className="resumeItem">
@@ -317,7 +317,7 @@ function App() {
         ))}
         <button onClick={() => handleOpenEducationForm(null)}>Add Education</button>
       </div>
-      
+
       {showEducationForm && (
         <div className="modal">
           <div className="modal-content">
@@ -328,7 +328,7 @@ function App() {
             <input type="text" name="end_date" value={educationFormData.end_date} onChange={handleEducationFormChange} placeholder="End Date" />
             <input type="text" name="grade" value={educationFormData.grade} onChange={handleEducationFormChange} placeholder="Grade/GPA" />
             <textarea name="description" value={educationFormData.description} onChange={handleEducationFormChange} placeholder="Description" />
-            
+
             <div className="suggestions-container">
               <button onClick={handleGetEducationSuggestions} disabled={isLoadingEducationSuggestions}>
                 {isLoadingEducationSuggestions ? 'Getting Suggestions...' : 'Get AI Suggestions'}
@@ -352,14 +352,15 @@ function App() {
           </div>
         </div>
       )}
-      
+
       {/* Skills Section (TODO) */}
+
       <div className="resumeSection">
         <h2>Skills</h2>
         <p>Skill Placeholder</p>
         <button>Add Skill</button>
       </div>
-      
+
       <br />
       <button>Export</button>
     </div>
