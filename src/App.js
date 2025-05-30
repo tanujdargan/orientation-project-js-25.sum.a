@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "./App.css";
-// import Education from "./components/Education"; // Keep or remove based on future refactoring
-
+import InfoForm from './InfoForm'; // Import the new form
 const API_BASE_URL = 'http://localhost:5000'; // Assuming Python backend runs on port 5000
 
 function App() {
@@ -249,7 +248,13 @@ function App() {
     <div className="App">
       <h1>Resume Builder</h1>
 
-      {/* --- Experience Section --- */}
+      {/* Personal Info Section */}
+      <div className="resumeSection">
+        <h2>Personal Information</h2>
+        <InfoForm />
+      </div>
+
+      {/* Experience Section */}
       <div className="resumeSection">
         <h2>Experience</h2>
         {augmentedExperienceList.map((exp, index) => (
@@ -297,8 +302,9 @@ function App() {
         </div>
       )}
 
-      {/* --- Education Section --- */}
-      <div className="resumeSection">
+      {/* Education Section (TODO) */}
+
+<div className="resumeSection">
         <h2>Education</h2>
         {augmentedEducationList.map((edu, index) => (
           <div key={edu.id || index} className="resumeItem">
@@ -347,7 +353,8 @@ function App() {
         </div>
       )}
 
-      {/* --- Skills Section (TODO) --- */}
+      {/* Skills Section (TODO) */}
+
       <div className="resumeSection">
         <h2>Skills</h2>
         <p>Skill Placeholder</p>
