@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
-const InfoForm = ({ name, setName, phoneNumber, setPhoneNumber, email, setEmail }) => {
+const InfoForm = () => {
+    const [name, setName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [email, setEmail] = useState('');
     const [isEditing, setIsEditing] = useState(false);
-    const [userId, setUserId] = useState(null); 
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
         if (name === '' && phoneNumber === '' && email === '' && userId === null) {
@@ -12,36 +15,70 @@ const InfoForm = ({ name, setName, phoneNumber, setPhoneNumber, email, setEmail 
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        // Basic validation
         if (!name || !phoneNumber || !email) {
             alert('All fields are required.');
             return;
         }
+        
         if (!/^\+\d+$/.test(phoneNumber)) {
             alert('Phone number must be in international format (e.g., +1234567890).');
             return;
         }
+
         if (!/\S+@\S+\.\S+/.test(email)) {
             alert('Please enter a valid email address.');
             return;
         }
+        
         const userData = { name, phoneNumber, email };
+
         try {
+            // let response; // Uncomment if you use the fetch calls
             if (isEditing && userId) {
-                console.log('Updating user (via props):', userId, userData);
-                alert('User data update initiated (see console).'); 
+                // Placeholder for UPDATE API call
+                console.log('Updating user:', userId, userData);
+                // response = await fetch(`/api/users/${userId}`, {
+                //     method: 'PUT',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(userData),
+                // });
+                alert('User data update initiated (see console).'); // Placeholder
             } else {
-                console.log('Adding new user (via props):', userData);
-                alert('User data submission initiated (see console).');
+                // Placeholder for ADD API call
+                console.log('Adding new user:', userData);
+                // response = await fetch('/api/users', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(userData),
+                // });
+                alert('User data submission initiated (see console).'); // Placeholder
             }
+
+            // const result = await response.json(); // Uncomment if you use the fetch calls
+            // if (response.ok) {
+            //     alert(`User data ${isEditing ? 'updated' : 'added'} successfully!`);
+            //     // Reset form or redirect, etc.
+            //     setName('');
+            //     setPhoneNumber('');
+            //     setEmail('');
+            //     setIsEditing(false);
+            //     setUserId(null);
+            // } else {
+            //     alert(`Error: ${result.message || 'Something went wrong.'}`);
+            // }
         } catch (error) {
             console.error('API call failed:', error);
             alert('API call failed. See console for details.');
         }
     };
 
+    // Dummy function to simulate loading data for editing
     const loadUserDataForEdit = (id) => {
+        // In a real app, you'd fetch this from a backend
         const dummyData = {
-            '123': { name: 'Jane Doe (Loaded)', phoneNumber: '+11234567890', email: 'jane.doe.loaded@example.com' },
+            '123': { name: 'John Doe', phoneNumber: '+19876543210', email: 'john.doe@example.com' },
+            // Add more dummy users if needed
         };
         if (dummyData[id]) {
             const user = dummyData[id];
@@ -90,6 +127,7 @@ const InfoForm = ({ name, setName, phoneNumber, setPhoneNumber, email, setEmail 
                         required
                     />
                 </div>
+
                 <div className="form-buttons-container no-print">
                     <button type="submit">{isEditing ? 'Update' : 'Add'}</button>
                     {!isEditing && (
@@ -114,4 +152,4 @@ const InfoForm = ({ name, setName, phoneNumber, setPhoneNumber, email, setEmail 
     );
 };
 
-export default InfoForm; 
+export default InfoForm;

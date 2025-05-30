@@ -275,6 +275,12 @@ function App() {
         </div>
       </div>
 
+      {/* Personal Info Section */}
+      <div className="resumeSection">
+        <h2>Personal Information</h2>
+        <InfoForm />
+      </div>
+
       {/* Experience Section */}
       <div className="resumeSection">
         <h2>Experience</h2>
@@ -323,8 +329,7 @@ function App() {
         </div>
       )}
 
-      {/* Education Section (TODO) */}
-      <div className="resumeSection">
+<div className="resumeSection">
         <h2>Education</h2>
         {augmentedEducationList.map((edu, index) => (
           <div key={edu.id || index} className="resumeItem">
